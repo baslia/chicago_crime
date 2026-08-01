@@ -18,14 +18,14 @@ from src import charts, config, data
 
 st.set_page_config(
     page_title="Chicago Crime Dashboard",
-    page_icon="🚔",
+    page_icon="🐕",
     layout="wide",
 )
 
 
 # --- sidebar filters ----------------------------------------------------------
 def sidebar_filters() -> dict:
-    st.sidebar.title("🚔 Chicago Crime")
+    st.sidebar.title("🐕 Chicago Crime")
     st.sidebar.caption("Open data · City of Chicago (SODA API)")
 
     today = date.today()
