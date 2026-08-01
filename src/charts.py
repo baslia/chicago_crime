@@ -52,6 +52,54 @@ def build_map(df: pd.DataFrame) -> folium.Map:
     return m
 
 
+def build_choropleth(area_df: pd.DataFrame, geojson: dict) -> folium.Map:
+    """Shade the 77 community areas by crime count, with a hover tooltip."""
+    m = folium.Map(
+        location=list(config.CHICAGO_CENTER),
+        zoom_start=config.DEFAULT_ZOOM,
+        tiles="CartoDB positron",
+    )
+    if area_df.empty:
+        return m
+
+    # Keyed on the string area code present in both the GeoJSON (`area_numbe`)
+    # and the aggregation (`community_area`).
+    counts = area_df.copy()
+    counts["community_area"] = counts["community_area"].astype(str)
+
+    folium.Choropleth(
+        geo_data=geojson,
+        data=counts,
+        columns=["community_area", "count"],
+        key_on="feature.properties.area_numbe",
+        fill_color="YlOrRd",
+        fill_opacity=0.7,
+        line_opacity=0.3,
+        nan_fill_color="#f0f0f0",
+        legend_name="Crimes in selected range",
+        name="Crime density",
+    ).add_to(m)
+
+    # A transparent GeoJson layer on top to carry an interactive tooltip.
+    lookup = dict(zip(counts["community_area"], counts["count"]))
+    for feat in geojson["features"]:
+        code = str(feat["properties"].get("area_numbe"))
+        feat["properties"]["crimes"] = int(lookup.get(code, 0))
+        feat["properties"]["name"] = feat["properties"].get("community", "").title()
+    folium.GeoJson(
+        geojson,
+        style_function=lambda _f: {"fillOpacity": 0, "color": "transparent", "weight": 0},
+        highlight_function=lambda _f: {"weight": 2, "color": "#333", "fillOpacity": 0.1},
+        tooltip=folium.GeoJsonTooltip(
+            fields=["name", "crimes"],
+            aliases=["Community area:", "Crimes:"],
+            localize=True,
+        ),
+        name="Hover",
+    ).add_to(m)
+    return m
+
+
 def type_legend(df: pd.DataFrame) -> list[tuple[str, str]]:
     """(type, color) pairs present in the current map data, for a legend."""
     if df.empty:
