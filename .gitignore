@@ -218,3 +218,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Chicago Crime dashboard local snapshot
+data/*.parquet
