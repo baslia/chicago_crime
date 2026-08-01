@@ -18,6 +18,7 @@ freshness but transparently fall back to the snapshot if the network fails.
 
 from __future__ import annotations
 
+import json
 import os
 from datetime import date
 from pathlib import Path
@@ -36,6 +37,7 @@ except ImportError:  # pragma: no cover
     pass
 
 SNAPSHOT_PATH = Path(__file__).resolve().parent.parent / "data" / "snapshot.parquet"
+GEOJSON_PATH = Path(__file__).resolve().parent / "assets" / "community_areas.geojson"
 
 
 # --- client -------------------------------------------------------------------
@@ -228,6 +230,13 @@ def agg_by_community_area(start, end, crime_types=(), community_areas=(), arrest
     df["count"] = df["count"].astype(int)
     df["area_name"] = df["community_area"].apply(config.community_area_name)
     return df
+
+
+@st.cache_data(ttl=86400, show_spinner=False)
+def community_area_geojson() -> dict:
+    """Chicago's 77 community-area boundaries (bundled locally, source: igwz-8jzy)."""
+    with open(GEOJSON_PATH) as fh:
+        return json.load(fh)
 
 
 @st.cache_data(ttl=86400, show_spinner=False)
