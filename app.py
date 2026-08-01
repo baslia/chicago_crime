@@ -9,7 +9,7 @@ An app token is optional (higher rate limits); set SOCRATA_APP_TOKEN if you have
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timedelta
 
 import streamlit as st
 from streamlit_folium import st_folium
@@ -30,12 +30,31 @@ def sidebar_filters() -> dict:
 
     today = date.today()
     default_start = date(today.year, 1, 1)
+    # Seed the shared date-range state once; the picker and presets both use it.
+    if "date_range" not in st.session_state:
+        st.session_state["date_range"] = (default_start, today)
+
+    st.sidebar.markdown("**Date range**")
+    presets = [
+        ("30d", lambda: (today - timedelta(days=30), today)),
+        ("90d", lambda: (today - timedelta(days=90), today)),
+        ("YTD", lambda: (date(today.year, 1, 1), today)),
+        ("1 year", lambda: (today - timedelta(days=365), today)),
+        ("All", lambda: (date(config.MIN_YEAR, 1, 1), today)),
+    ]
+    # Buttons return True only on the click run, so a preset is applied once and
+    # never fights a later manual edit. Set state *before* the picker is created.
+    cols = st.sidebar.columns(len(presets))
+    for col, (label, compute) in zip(cols, presets):
+        if col.button(label, use_container_width=True, key=f"preset_{label}"):
+            st.session_state["date_range"] = compute()
 
     picked = st.sidebar.date_input(
         "Date range",
-        value=(default_start, today),
+        key="date_range",
         min_value=date(config.MIN_YEAR, 1, 1),
         max_value=today,
+        label_visibility="collapsed",
         help="Analytics aggregate across this whole range; the map shows the "
         "most recent matching incidents up to the marker cap.",
     )
