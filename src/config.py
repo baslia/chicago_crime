@@ -43,56 +43,64 @@ DEFAULT_ZOOM = 11
 MIN_YEAR = 2001
 
 # --- Crime-type colors --------------------------------------------------------
-# A rich but restrained palette: deep, saturated jewel tones rather than pastels
-# or greys, so the map legend reads as colorful yet serious. The most common
-# types get maximally-distinct hues spread across the wheel (they dominate any
-# legend); rarer types share hue families with their group. Nearly every Chicago
-# `primary_type` is covered so few fall through to the neutral OTHER_COLOR.
+# Goal: every crime type is *easily* distinguishable from its neighbors, while
+# the palette still reads as serious (deep Material-Design 700-level tones, all
+# legible on the light map — no pastels, no neon).
+#
+# The legend is rendered in alphabetical order, so the trick is to assign colors
+# in alphabetical order too, cycling a palette whose *consecutive* entries are
+# maximally far apart on the color wheel. That guarantees neighbouring legend
+# rows never look alike. Categories are intentionally NOT grouped by hue —
+# grouping (all "violent" = reds) is precisely what made colors blur together.
+DISTINCT_PALETTE: list[str] = [
+    "#d32f2f",  # red
+    "#1976d2",  # blue
+    "#388e3c",  # green
+    "#f57c00",  # orange
+    "#7b1fa2",  # purple
+    "#0097a7",  # cyan
+    "#5d4037",  # brown
+    "#c2185b",  # pink
+    "#9e9d24",  # olive
+    "#303f9f",  # indigo
+    "#00796b",  # teal
+    "#f9a825",  # amber
+    "#512da8",  # deep purple
+    "#689f38",  # light green
+    "#0288d1",  # light blue
+    "#e64a19",  # deep orange
+    "#455a64",  # blue-grey
+    "#ad1457",  # dark pink
+    "#b71c1c",  # dark red
+    "#004d40",  # dark teal
+    "#4a148c",  # dark purple
+    "#33691e",  # dark green
+    "#bf360c",  # rust
+    "#01579b",  # dark blue (kept last: far from the red at index 0 on wrap)
+]
+
+# Canonical set of Chicago `primary_type` values (both historical and current
+# spellings). Sorted, then zipped with the cycled palette for stable colors.
+_KNOWN_TYPES: list[str] = sorted({
+    "ARSON", "ASSAULT", "BATTERY", "BURGLARY",
+    "CONCEALED CARRY LICENSE VIOLATION", "CRIM SEXUAL ASSAULT",
+    "CRIMINAL DAMAGE", "CRIMINAL SEXUAL ASSAULT", "CRIMINAL TRESPASS",
+    "DECEPTIVE PRACTICE", "DOMESTIC VIOLENCE", "GAMBLING", "HOMICIDE",
+    "HUMAN TRAFFICKING", "INTERFERENCE WITH PUBLIC OFFICER", "INTIMIDATION",
+    "KIDNAPPING", "LIQUOR LAW VIOLATION", "MOTOR VEHICLE THEFT", "NARCOTICS",
+    "NON-CRIMINAL", "OBSCENITY", "OFFENSE INVOLVING CHILDREN",
+    "OTHER NARCOTIC VIOLATION", "OTHER OFFENSE", "PROSTITUTION",
+    "PUBLIC INDECENCY", "PUBLIC PEACE VIOLATION", "RITUALISM", "ROBBERY",
+    "SEX OFFENSE", "STALKING", "THEFT", "WEAPONS VIOLATION",
+})
+
 CRIME_TYPE_COLORS: dict[str, str] = {
-    # Property / financial — blues, ambers, greens
-    "THEFT": "#2563eb",
-    "BURGLARY": "#ca8a04",
-    "MOTOR VEHICLE THEFT": "#059669",
-    "CRIMINAL DAMAGE": "#d97706",
-    "CRIMINAL TRESPASS": "#65a30d",
-    "ARSON": "#f97316",
-    "DECEPTIVE PRACTICE": "#7c3aed",
-    # Violent — reds, crimson, rose
-    "HOMICIDE": "#7a0c1f",
-    "BATTERY": "#dc2626",
-    "ASSAULT": "#ea580c",
-    "ROBBERY": "#e11d48",
-    "KIDNAPPING": "#9f1239",
-    "INTIMIDATION": "#be123c",
-    "HUMAN TRAFFICKING": "#831843",
-    "DOMESTIC VIOLENCE": "#be185d",
-    # Sexual — pink / fuchsia
-    "CRIMINAL SEXUAL ASSAULT": "#c026d3",
-    "CRIM SEXUAL ASSAULT": "#c026d3",
-    "SEX OFFENSE": "#db2777",
-    "STALKING": "#f43f5e",
-    # Drugs & vice — teals, purples
-    "NARCOTICS": "#0d9488",
-    "OTHER NARCOTIC VIOLATION": "#0e7490",
-    "PROSTITUTION": "#a21caf",
-    "GAMBLING": "#7e22ce",
-    "LIQUOR LAW VIOLATION": "#9333ea",
-    "OBSCENITY": "#86198f",
-    "PUBLIC INDECENCY": "#a855f7",
-    # Weapons — indigo / violet
-    "WEAPONS VIOLATION": "#4f46e5",
-    "CONCEALED CARRY LICENSE VIOLATION": "#6d28d9",
-    # Public order & other — cyan / sky / slate
-    "OFFENSE INVOLVING CHILDREN": "#0891b2",
-    "PUBLIC PEACE VIOLATION": "#0284c7",
-    "INTERFERENCE WITH PUBLIC OFFICER": "#0369a1",
-    "OTHER OFFENSE": "#475569",
-    "NON-CRIMINAL": "#64748b",
-    "NON - CRIMINAL": "#64748b",
-    "RITUALISM": "#713f12",
+    t: DISTINCT_PALETTE[i % len(DISTINCT_PALETTE)]
+    for i, t in enumerate(_KNOWN_TYPES)
 }
-# Muted slate for anything uncovered — neutral without reading as dead grey.
-OTHER_COLOR = "#64748b"
+
+# Neutral blue-grey for any truly unknown type (rare).
+OTHER_COLOR = "#78909c"
 
 
 def color_for(primary_type: str) -> str:
