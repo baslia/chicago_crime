@@ -35,19 +35,22 @@ def sidebar_filters() -> dict:
         st.session_state["date_range"] = (default_start, today)
 
     st.sidebar.markdown("**Date range**")
-    presets = [
-        ("30d", lambda: (today - timedelta(days=30), today)),
-        ("90d", lambda: (today - timedelta(days=90), today)),
-        ("YTD", lambda: (date(today.year, 1, 1), today)),
-        ("1 year", lambda: (today - timedelta(days=365), today)),
-        ("All", lambda: (date(config.MIN_YEAR, 1, 1), today)),
-    ]
-    # Buttons return True only on the click run, so a preset is applied once and
-    # never fights a later manual edit. Set state *before* the picker is created.
-    cols = st.sidebar.columns(len(presets))
-    for col, (label, compute) in zip(cols, presets):
-        if col.button(label, use_container_width=True, key=f"preset_{label}"):
-            st.session_state["date_range"] = compute()
+    presets = {
+        "30d": lambda: (today - timedelta(days=30), today),
+        "90d": lambda: (today - timedelta(days=90), today),
+        "YTD": lambda: (date(today.year, 1, 1), today),
+        "1y": lambda: (today - timedelta(days=365), today),
+        "All": lambda: (date(config.MIN_YEAR, 1, 1), today),
+    }
+    # Compact pill shortcuts. Apply a preset only when the selection *changes* so
+    # it's applied once and never fights a later manual edit of the picker.
+    choice = st.sidebar.pills(
+        "Quick range", options=list(presets), selection_mode="single",
+        key="date_preset", label_visibility="collapsed",
+    )
+    if choice and choice != st.session_state.get("_applied_preset"):
+        st.session_state["_applied_preset"] = choice
+        st.session_state["date_range"] = presets[choice]()
 
     picked = st.sidebar.date_input(
         "Date range",
@@ -64,14 +67,28 @@ def sidebar_filters() -> dict:
     else:
         start, end = default_start, today
 
+    st.sidebar.markdown("**Crime groups**")
+    selected_groups = st.sidebar.pills(
+        "Crime groups", options=list(config.CRIME_GROUPS), selection_mode="multi",
+        key="crime_groups", label_visibility="collapsed",
+        help="Shortcuts that expand into their underlying crime types.",
+    )
+    group_types = config.expand_groups(selected_groups)
+
     try:
         all_types = data.list_primary_types()
     except Exception:
         all_types = sorted(config.CRIME_TYPE_COLORS.keys())
-    crime_types = st.sidebar.multiselect(
-        "Crime types", options=all_types, default=[],
-        help="Leave empty for all types.",
+    individual_types = st.sidebar.multiselect(
+        "Individual types (drilldown)", options=all_types, default=[],
+        help="Refine further. Combined with any selected groups.",
     )
+
+    # Effective filter = union of expanded groups + individually picked types.
+    # Empty means "all types".
+    crime_types = tuple(dict.fromkeys((*group_types, *individual_types)))
+    if selected_groups or individual_types:
+        st.sidebar.caption(f"Filtering {len(crime_types)} crime type(s).")
 
     area_options = list(config.COMMUNITY_AREAS.items())
     area_labels = {f"{code} — {name}": code for code, name in area_options}
