@@ -73,6 +73,47 @@ def color_for(primary_type: str) -> str:
     return CRIME_TYPE_COLORS.get((primary_type or "").upper(), OTHER_COLOR)
 
 
+# --- Crime groups (clusters) --------------------------------------------------
+# High-level shortcuts that expand into the dataset's fine-grained `primary_type`
+# values. Selecting a group filters to all of its types; the individual-type
+# drilldown still works alongside these. A group may hold one type or many.
+# Both historical and current spellings are included (e.g. sexual assault) so the
+# filter matches regardless of when the incident was recorded; unmatched spellings
+# simply return nothing and are harmless.
+CRIME_GROUPS: dict[str, list[str]] = {
+    "Violent": [
+        "HOMICIDE", "CRIMINAL SEXUAL ASSAULT", "CRIM SEXUAL ASSAULT", "ASSAULT",
+        "BATTERY", "ROBBERY", "KIDNAPPING", "INTIMIDATION", "HUMAN TRAFFICKING",
+    ],
+    "Property": [
+        "THEFT", "BURGLARY", "MOTOR VEHICLE THEFT", "CRIMINAL DAMAGE",
+        "CRIMINAL TRESPASS", "ARSON", "DECEPTIVE PRACTICE",
+    ],
+    "Drugs & Vice": [
+        "NARCOTICS", "OTHER NARCOTIC VIOLATION", "PROSTITUTION", "GAMBLING",
+        "LIQUOR LAW VIOLATION", "OBSCENITY", "PUBLIC INDECENCY",
+    ],
+    "Weapons": ["WEAPONS VIOLATION", "CONCEALED CARRY LICENSE VIOLATION"],
+    "Sexual": [
+        "CRIMINAL SEXUAL ASSAULT", "CRIM SEXUAL ASSAULT", "SEX OFFENSE", "STALKING",
+    ],
+    "Public order": [
+        "PUBLIC PEACE VIOLATION", "INTERFERENCE WITH PUBLIC OFFICER",
+        "OTHER OFFENSE", "NON-CRIMINAL", "NON - CRIMINAL",
+    ],
+    "Domestic-related": ["OFFENSE INVOLVING CHILDREN"],
+}
+
+
+def expand_groups(group_names) -> tuple[str, ...]:
+    """Union the primary types covered by the named groups (order-stable, deduped)."""
+    seen: dict[str, None] = {}
+    for name in group_names:
+        for t in CRIME_GROUPS.get(name, []):
+            seen.setdefault(t, None)
+    return tuple(seen)
+
+
 # --- Community areas ----------------------------------------------------------
 # Chicago's 77 official community areas. The dataset stores `community_area` as
 # the numeric code; this maps it to a human-readable name for the geo view.
