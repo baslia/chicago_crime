@@ -1,5 +1,9 @@
 # 🐕 Chicago Crime Dashboard
 
+[![Live app](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://chicagocrimevienna.streamlit.app)
+
+**🔴 Live demo: [chicagocrimevienna.streamlit.app](https://chicagocrimevienna.streamlit.app)**
+
 An open-source, interactive dashboard exploring crime in Chicago using the
 City of Chicago's open data. Built with [Streamlit](https://streamlit.io),
 [folium](https://python-visualization.github.io/folium/), and
@@ -32,6 +36,9 @@ Plotting millions of markers would crash a browser, so:
   showing the most recent incidents matching your filters.
 
 ## Quick start
+
+The app is deployed at **[chicagocrimevienna.streamlit.app](https://chicagocrimevienna.streamlit.app)** —
+no setup needed to try it. To run it locally:
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
@@ -70,11 +77,17 @@ src/charts.py           folium map + Plotly charts
 scripts/refresh_data.py Build the local Parquet snapshot
 ```
 
-## Deploy to Streamlit Community Cloud
+## Deploy
+
+This dashboard is deployed on Streamlit Community Cloud at
+**[chicagocrimevienna.streamlit.app](https://chicagocrimevienna.streamlit.app)**.
+
+To deploy your own fork:
 
 1. Push this repo to GitHub.
 2. On [share.streamlit.io](https://share.streamlit.io), point a new app at `app.py`.
-3. (Optional) add `SOCRATA_APP_TOKEN` under the app's **Secrets**.
+3. (Optional) add `SOCRATA_APP_TOKEN` under the app's **Secrets** for higher API
+   rate limits — recommended, since Community Cloud apps share an outbound IP.
 
 ## License
 
