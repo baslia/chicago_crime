@@ -176,6 +176,16 @@ def geo_view(f: dict) -> None:
     if area_df.empty:
         st.info("No data for these filters.")
         return
+
+    st.caption("Community areas shaded by crime count — hover for details.")
+    st_folium(
+        charts.build_choropleth(area_df, data.community_area_geojson()),
+        use_container_width=True,
+        height=520,
+        returned_objects=[],
+        key="choropleth",
+    )
+
     st.plotly_chart(charts.chart_by_area(area_df), use_container_width=True)
     with st.expander("View table"):
         st.dataframe(
