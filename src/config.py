@@ -43,29 +43,56 @@ DEFAULT_ZOOM = 11
 MIN_YEAR = 2001
 
 # --- Crime-type colors --------------------------------------------------------
-# A stable, readable palette for the most common primary types. Anything not
-# listed falls back to OTHER_COLOR. Colors are chosen to be distinguishable and
-# color-blind friendly-ish; tweak freely.
+# A rich but restrained palette: deep, saturated jewel tones rather than pastels
+# or greys, so the map legend reads as colorful yet serious. The most common
+# types get maximally-distinct hues spread across the wheel (they dominate any
+# legend); rarer types share hue families with their group. Nearly every Chicago
+# `primary_type` is covered so few fall through to the neutral OTHER_COLOR.
 CRIME_TYPE_COLORS: dict[str, str] = {
-    "THEFT": "#4e79a7",
-    "BATTERY": "#e15759",
-    "CRIMINAL DAMAGE": "#f28e2b",
-    "NARCOTICS": "#76b7b2",
-    "ASSAULT": "#b07aa1",
-    "OTHER OFFENSE": "#9c755f",
-    "BURGLARY": "#edc948",
-    "MOTOR VEHICLE THEFT": "#59a14f",
-    "DECEPTIVE PRACTICE": "#ff9da7",
-    "ROBBERY": "#bab0ac",
-    "CRIMINAL TRESPASS": "#86bcb6",
-    "WEAPONS VIOLATION": "#d37295",
-    "OFFENSE INVOLVING CHILDREN": "#a0cbe8",
-    "PUBLIC PEACE VIOLATION": "#8cd17d",
-    "CRIM SEXUAL ASSAULT": "#b6992d",
-    "SEX OFFENSE": "#499894",
-    "HOMICIDE": "#000000",
+    # Property / financial — blues, ambers, greens
+    "THEFT": "#2563eb",
+    "BURGLARY": "#ca8a04",
+    "MOTOR VEHICLE THEFT": "#059669",
+    "CRIMINAL DAMAGE": "#d97706",
+    "CRIMINAL TRESPASS": "#65a30d",
+    "ARSON": "#f97316",
+    "DECEPTIVE PRACTICE": "#7c3aed",
+    # Violent — reds, crimson, rose
+    "HOMICIDE": "#7a0c1f",
+    "BATTERY": "#dc2626",
+    "ASSAULT": "#ea580c",
+    "ROBBERY": "#e11d48",
+    "KIDNAPPING": "#9f1239",
+    "INTIMIDATION": "#be123c",
+    "HUMAN TRAFFICKING": "#831843",
+    "DOMESTIC VIOLENCE": "#be185d",
+    # Sexual — pink / fuchsia
+    "CRIMINAL SEXUAL ASSAULT": "#c026d3",
+    "CRIM SEXUAL ASSAULT": "#c026d3",
+    "SEX OFFENSE": "#db2777",
+    "STALKING": "#f43f5e",
+    # Drugs & vice — teals, purples
+    "NARCOTICS": "#0d9488",
+    "OTHER NARCOTIC VIOLATION": "#0e7490",
+    "PROSTITUTION": "#a21caf",
+    "GAMBLING": "#7e22ce",
+    "LIQUOR LAW VIOLATION": "#9333ea",
+    "OBSCENITY": "#86198f",
+    "PUBLIC INDECENCY": "#a855f7",
+    # Weapons — indigo / violet
+    "WEAPONS VIOLATION": "#4f46e5",
+    "CONCEALED CARRY LICENSE VIOLATION": "#6d28d9",
+    # Public order & other — cyan / sky / slate
+    "OFFENSE INVOLVING CHILDREN": "#0891b2",
+    "PUBLIC PEACE VIOLATION": "#0284c7",
+    "INTERFERENCE WITH PUBLIC OFFICER": "#0369a1",
+    "OTHER OFFENSE": "#475569",
+    "NON-CRIMINAL": "#64748b",
+    "NON - CRIMINAL": "#64748b",
+    "RITUALISM": "#713f12",
 }
-OTHER_COLOR = "#7f7f7f"
+# Muted slate for anything uncovered — neutral without reading as dead grey.
+OTHER_COLOR = "#64748b"
 
 
 def color_for(primary_type: str) -> str:
