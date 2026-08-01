@@ -169,9 +169,13 @@ def map_view(f: dict) -> None:
         st.markdown("**Legend**")
         for crime_type, color in charts.type_legend(incidents):
             st.markdown(
-                f"<span style='display:inline-block;width:10px;height:10px;"
-                f"border-radius:50%;background:{color};margin-right:6px;'></span>"
-                f"<span style='font-size:0.8rem'>{crime_type.title()}</span>",
+                f"<div style='display:flex;align-items:center;margin:2px 0;'>"
+                f"<span style='display:inline-block;width:13px;height:13px;"
+                f"border-radius:50%;background:{color};margin-right:8px;"
+                f"border:1px solid rgba(0,0,0,0.15);"
+                f"box-shadow:0 0 0 2px {color}22;flex:0 0 auto;'></span>"
+                f"<span style='font-size:0.82rem'>{crime_type.title()}</span>"
+                f"</div>",
                 unsafe_allow_html=True,
             )
 
