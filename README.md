@@ -1,4 +1,4 @@
-# 🚔 Chicago Crime Dashboard
+# 🐕 Chicago Crime Dashboard
 
 An open-source, interactive dashboard exploring crime in Chicago using the
 City of Chicago's open data. Built with [Streamlit](https://streamlit.io),
